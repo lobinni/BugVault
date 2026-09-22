@@ -1,0 +1,46 @@
+{
+  "schema_version": 2,
+  "network": "studionet",
+  "network_alias": "testnet-asimov",
+  "explorer_base": "https://explorer-studio.genlayer.com/address/",
+  "last_update": "2026 — v2 challenge-window deployment recorded",
+  "status": "BugVault v2 deployed; CredPass oracle wiring must be verified on-chain",
+  "deployment_order": ["BugVault@v2", "CredPass.set_oracle(BugVault@v2)", "live smoke suite"],
+  "contracts": {
+    "BugVault": {
+      "source": "contracts/bug_vault.py",
+      "current_version": "v2",
+      "address": "0xD57A790cDc4A6a456A2C064D80153B0cb679d724",
+      "constructor_args": [200],
+      "constructor_note": "platform_fee_bps = 200 (2.0%)",
+      "explorer": "https://explorer-studio.genlayer.com/address/0xD57A790cDc4A6a456A2C064D80153B0cb679d724",
+      "deployment_marker": "get_config.challenge_window_seconds = 259200",
+      "fixes": [
+        "A rejected claim records rejected_epoch",
+        "The researcher has a 3-day on-chain challenge window",
+        "cancel_bounty and reclaim_expired_bounty are blocked while a rejection is challengeable",
+        "A challenge submitted after the deadline is refused and its bond is refunded"
+      ],
+      "supersedes": {
+        "version": "v1",
+        "address": "0xAe717Dd46C96D06cE766d27c04f3e6385563aA3B",
+        "status": "unsafe historical deployment — do not send value",
+        "reason": "Predates the enforced rejection challenge window",
+        "explorer": "https://explorer-studio.genlayer.com/address/0xAe717Dd46C96D06cE766d27c04f3e6385563aA3B"
+      }
+    },
+    "CredPass": {
+      "source": "contracts/cred_pass.py",
+      "address": "0x2c9d68A00f110DCB2f9CBb41b77A748c080cBF39",
+      "explorer": "https://explorer-studio.genlayer.com/address/0x2c9d68A00f110DCB2f9CBb41b77A748c080cBF39",
+      "expected_oracle": "0xD57A790cDc4A6a456A2C064D80153B0cb679d724",
+      "wiring_status": "verify get_stats.oracle on-chain; call set_oracle(expected_oracle) as owner if it still points at v1",
+      "original_constructor_args": ["0xAe717Dd46C96D06cE766d27c04f3e6385563aA3B"]
+    }
+  },
+  "verification": {
+    "command": "LIVE_SMOKE=1 python3 -m pytest tests/integration/test_live_smoke.py -v",
+    "expected_result": "all live smoke tests pass, including CredPass oracle equality"
+  },
+  "upgrade_policy": "Intelligent Contracts are immutable. Deploy changed vault source at a fresh address, then repoint CredPass with set_oracle."
+}

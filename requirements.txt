@@ -1,0 +1,5 @@
+# Toolchain for lint + integration layers. The offline test layer needs
+# NOTHING beyond Python 3.10+ stdlib — see docs/TESTING.md.
+genvm-linter>=0.1
+genlayer-test>=1.0
+pytest>=8.0
